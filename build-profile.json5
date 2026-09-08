@@ -1,0 +1,60 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "/Users/jie/.ohos/config/default_rfc9421_signing_hos_OK6PNj1-ZA6_EqLTbVY0DkmCacNHX-zF5QeYSwtgVI4=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001A3D0B0991845152F922F05BCF81F4F4CB4E03B44A8304F892B1E123ADBA0F8E2B6E0E41193BDB",
+          "profile": "/Users/jie/.ohos/config/default_rfc9421_signing_hos_OK6PNj1-ZA6_EqLTbVY0DkmCacNHX-zF5QeYSwtgVI4=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/jie/.ohos/config/default_rfc9421_signing_hos_OK6PNj1-ZA6_EqLTbVY0DkmCacNHX-zF5QeYSwtgVI4=.p12",
+          "storePassword": "0000001A724B0917B717E67A31A51F005FF8D20F65B63FA61DC2925B98F185CDDE7E03B110121454891B"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "targetSdkVersion": "26.0.0",
+        "compatibleSdkVersion": "6.0.1(21)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rfc9421_signing",
+      "srcPath": "./rfc9421_signing",
+    }
+  ]
+}
