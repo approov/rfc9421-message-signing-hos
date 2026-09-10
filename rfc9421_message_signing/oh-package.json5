@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "An ArkTS implementation of RFC 9421 HTTP Message Signatures' component identifiers, HTTP field canonicalization, Signature-Input parameters, and signature base construction.",
   "main": "Index.ets",
-  "author": "approov",
+  "author": "approov (https://approov.io)",
+  "repository": "https://github.com/approov/rfc9421-message-signing-hos",
   "license": "MIT",
   "dependencies": {
     "@approov/rfc9651-sfv": "1.0.0"
