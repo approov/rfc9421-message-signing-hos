@@ -110,7 +110,7 @@ Behavior:
   worth confirming that's the intended ergonomics before implementing.
 - Uses the existing `SignatureBaseBuilder` unchanged for the base string.
 - Serializing the merged `Signature-Input`/`Signature` Dictionaries reuses
-  `@approov/rfc8941_sfv`'s `Dictionary`/`ByteSequenceItem`, matching how `SignatureParameters`
+  `@approov/rfc9651-sfv`'s `Dictionary`/`ByteSequenceItem`, matching how `SignatureParameters`
   already builds its `InnerList`.
 
 ## 4. §3.2 + §3.2.1 + §4.3 Verification — `MessageVerifier.ets`
@@ -172,7 +172,7 @@ Step-by-step mapping to RFC 9421 §3.2:
 
 | RFC step | Implementation |
 | --- | --- |
-| 1, 1.1, 1.2 | Parse both headers as `Dictionary` (`@approov/rfc8941_sfv`); label-set mismatch (present in one but not the other) → `MalformedSignatureError`. `options.label` (or "all labels") selects which to process. |
+| 1, 1.1, 1.2 | Parse both headers as `Dictionary` (`@approov/rfc9651-sfv`); label-set mismatch (present in one but not the other) → `MalformedSignatureError`. `options.label` (or "all labels") selects which to process. |
 | 2 | `SignatureParameters.fromDictionaryEntry()` — already implemented. |
 | 3 | Extract the `ByteSequenceItem` value from the `Signature` Dictionary entry for the label. |
 | 4 | Apply `VerificationPolicy` (see below). |

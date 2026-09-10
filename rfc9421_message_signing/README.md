@@ -1,4 +1,4 @@
-# @approov/rfc9421-signing
+# @approov/rfc9421-message-signing
 
 English | [中文](readme-zh.md)
 
@@ -6,12 +6,12 @@ Repository: [https://github.com/approov/rfc9421-signing-hos](https://github.com/
 
 An ArkTS implementation of the message-component and signature-base machinery of [RFC 9421 HTTP Message Signatures](https://www.rfc-editor.org/rfc/rfc9421.html) (RFC 9421 §2): component identifiers, HTTP field canonicalization, `Signature-Input` parameters, and signature base construction. It does not perform signing/verification itself (no key management or crypto) — it produces the exact byte string a signer hands to its signing algorithm, and that a verifier reconstructs to check a signature against.
 
-Built on [@approov/rfc8941_sfv](https://github.com/approov/rfc8941-sfv-hos) for Structured Field Values (RFC 8941/9651) parsing and serialization.
+Built on [@approov/rfc9651-sfv](https://github.com/approov/rfc8941-sfv-hos) for Structured Field Values (RFC 8941/9651) parsing and serialization.
 
 ## Installation
 
 ```
-ohpm install @approov/rfc9421-signing
+ohpm install @approov/rfc9421-message-signing
 ```
 
 For more on setting up the OpenHarmony ohpm environment, see [How to install an OpenHarmony ohpm package](https://gitee.com/openharmony-tpc/docs/blob/master/OpenHarmony_har_usage.md).
@@ -23,7 +23,7 @@ For more on setting up the OpenHarmony ohpm environment, see [How to install an 
 `ComponentProvider` is an abstract class: implement it once per transport (e.g. an HTTP client's request/response type) to expose derived components (`@method`, `@path`, ...) and HTTP fields to the signature base builder.
 
 ```typescript
-import { ComponentProvider } from '@approov/rfc9421-signing';
+import { ComponentProvider } from '@approov/rfc9421-message-signing';
 
 class MyRequestComponentProvider extends ComponentProvider {
   getMethod(): string | null { return this.request.method; }
@@ -85,7 +85,7 @@ declares it; `;sf` on a field it returns `null` for always throws `ComponentValu
 ### Building a signature base
 
 ```typescript
-import { SignatureParameters, SignatureBaseBuilder, ComponentProvider } from '@approov/rfc9421-signing';
+import { SignatureParameters, SignatureBaseBuilder, ComponentProvider } from '@approov/rfc9421-message-signing';
 
 const params = new SignatureParameters()
   .addComponentIdentifier(ComponentProvider.DC_METHOD)
@@ -109,8 +109,8 @@ const base = new SignatureBaseBuilder(params, provider).createSignatureBase();
 ### Reconstructing parameters from a `Signature-Input` header
 
 ```typescript
-import { parseDictionary } from '@approov/rfc8941_sfv';
-import { SignatureParameters } from '@approov/rfc9421-signing';
+import { parseDictionary } from '@approov/rfc9651-sfv';
+import { SignatureParameters } from '@approov/rfc9421-message-signing';
 
 const dict = parseDictionary(signatureInputHeaderValue);
 const params = SignatureParameters.fromDictionaryEntry(dict, 'sig1');
@@ -138,7 +138,7 @@ getQueryParam(name: string): string | null {
 ```
 
 ```typescript
-import { StringItem, SfvParameters } from '@approov/rfc8941_sfv';
+import { StringItem, SfvParameters } from '@approov/rfc9651-sfv';
 
 const provider = new MyRequestComponentProvider(request); // q -> "café & crème"
 const id = StringItem.valueOf('@query-param').withParams(SfvParameters.EMPTY.add('name', 'q'));
@@ -155,7 +155,7 @@ return the encoded form directly.
 Every error thrown by this library extends `SignatureError`, and each subclass can also wrap an underlying cause (adopting its message/name/stack):
 
 ```typescript
-import { SignatureError, ComponentValueError } from '@approov/rfc9421-signing';
+import { SignatureError, ComponentValueError } from '@approov/rfc9421-message-signing';
 
 try {
   builder.createSignatureBase();

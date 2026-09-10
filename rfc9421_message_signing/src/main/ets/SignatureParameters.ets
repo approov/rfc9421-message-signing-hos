@@ -8,8 +8,8 @@ import {
   Dictionary,
   DecimalItem,
   DateItem,
-} from '@approov/rfc8941_sfv';
-import type { ItemType, SfvItemInput, ListElement } from '@approov/rfc8941_sfv';
+} from '@approov/rfc9651-sfv';
+import type { ItemType, SfvItemInput, ListElement } from '@approov/rfc9651-sfv';
 import { Decimal } from '@kit.ArkTS';
 import { MalformedComponentIdentifierError, MalformedSignatureInputError } from './errors';
 

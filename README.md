@@ -1,4 +1,4 @@
-# @approov/rfc9421-signing
+# @approov/rfc9421-message-signing
 
 English | [中文](readme-zh.md)
 
@@ -6,12 +6,12 @@ Repository: [https://github.com/approov/rfc9421-signing-hos](https://github.com/
 
 An ArkTS implementation of the message-component and signature-base machinery of [RFC 9421 HTTP Message Signatures](https://www.rfc-editor.org/rfc/rfc9421.html) (RFC 9421 §2): component identifiers, HTTP field canonicalization, `Signature-Input` parameters, and signature base construction. It does not perform signing/verification itself (no key management or crypto) — it produces the exact byte string a signer hands to its signing algorithm, and that a verifier reconstructs to check a signature against.
 
-Built on [@approov/rfc8941_sfv](https://github.com/approov/rfc8941-sfv-hos) for Structured Field Values (RFC 8941/9651) parsing and serialization.
+Built on [@approov/rfc9651-sfv](https://github.com/approov/rfc8941-sfv-hos) for Structured Field Values (RFC 8941/9651) parsing and serialization.
 
 ## Installation
 
 ```
-ohpm install @approov/rfc9421-signing
+ohpm install @approov/rfc9421-message-signing
 ```
 
 For more on setting up the OpenHarmony ohpm environment, see [How to install an OpenHarmony ohpm package](https://gitee.com/openharmony-tpc/docs/blob/master/OpenHarmony_har_usage.md).
@@ -23,7 +23,7 @@ For more on setting up the OpenHarmony ohpm environment, see [How to install an 
 `ComponentProvider` is an abstract class: implement it once per transport (e.g. an HTTP client's request/response type) to expose derived components (`@method`, `@path`, ...) and HTTP fields to the signature base builder.
 
 ```typescript
-import { ComponentProvider } from '@approov/rfc9421-signing';
+import { ComponentProvider } from '@approov/rfc9421-message-signing';
 
 class MyRequestComponentProvider extends ComponentProvider {
   getMethod(): string | null { return this.request.method; }
@@ -85,7 +85,7 @@ declares it; `;sf` on a field it returns `null` for always throws `ComponentValu
 ### Building a signature base
 
 ```typescript
-import { SignatureParameters, SignatureBaseBuilder, ComponentProvider } from '@approov/rfc9421-signing';
+import { SignatureParameters, SignatureBaseBuilder, ComponentProvider } from '@approov/rfc9421-message-signing';
 
 const params = new SignatureParameters()
   .addComponentIdentifier(ComponentProvider.DC_METHOD)
@@ -109,8 +109,8 @@ const base = new SignatureBaseBuilder(params, provider).createSignatureBase();
 ### Reconstructing parameters from a `Signature-Input` header
 
 ```typescript
-import { parseDictionary } from '@approov/rfc8941_sfv';
-import { SignatureParameters } from '@approov/rfc9421-signing';
+import { parseDictionary } from '@approov/rfc9651-sfv';
+import { SignatureParameters } from '@approov/rfc9421-message-signing';
 
 const dict = parseDictionary(signatureInputHeaderValue);
 const params = SignatureParameters.fromDictionaryEntry(dict, 'sig1');
@@ -138,7 +138,7 @@ getQueryParam(name: string): string | null {
 ```
 
 ```typescript
-import { StringItem, SfvParameters } from '@approov/rfc8941_sfv';
+import { StringItem, SfvParameters } from '@approov/rfc9651-sfv';
 
 const provider = new MyRequestComponentProvider(request); // q -> "café & crème"
 const id = StringItem.valueOf('@query-param').withParams(SfvParameters.EMPTY.add('name', 'q'));
@@ -155,7 +155,7 @@ return the encoded form directly.
 Every error thrown by this library extends `SignatureError`, and each subclass can also wrap an underlying cause (adopting its message/name/stack):
 
 ```typescript
-import { SignatureError, ComponentValueError } from '@approov/rfc9421-signing';
+import { SignatureError, ComponentValueError } from '@approov/rfc9421-message-signing';
 
 try {
   builder.createSignatureBase();
@@ -197,9 +197,9 @@ try {
 
 ## Testing
 
-[`HttpFieldsRfc9421.test.ets`](rfc9421_signing/src/ohosTest/ets/test/HttpFieldsRfc9421.test.ets) transcribes every worked example from [RFC 9421 §2.1 "HTTP Fields"](https://www.rfc-editor.org/rfc/rfc9421.html#http-fields) (including its subsections §2.1.1–§2.1.4) into runnable test cases against a fixture `ComponentProvider`. The table below is the same set of examples, for reference without reading the RFC itself.
+[`HttpFieldsRfc9421.test.ets`](rfc9421_message_signing/src/ohosTest/ets/test/HttpFieldsRfc9421.test.ets) transcribes every worked example from [RFC 9421 §2.1 "HTTP Fields"](https://www.rfc-editor.org/rfc/rfc9421.html#http-fields) (including its subsections §2.1.1–§2.1.4) into runnable test cases against a fixture `ComponentProvider`. The table below is the same set of examples, for reference without reading the RFC itself.
 
-[`ComplianceValidation.test.ets`](rfc9421_signing/src/ohosTest/ets/test/ComplianceValidation.test.ets) covers everything else this library validates or enforces beyond §2.1's worked examples: rejecting unknown/inapplicable component parameters, Boolean-flag parameter typing and `?0` handling, `@query-param` form-urlencoded decoding of `;name` and re-encoding of the returned value (including RFC 9421 §2.2.8's own worked examples, and a dedicated regression test pinning the exact percent-encode set against `encodeURIComponent()`'s different one), rejecting invalid derived/field component values, duplicate covered-component-identifier detection, `getComponentIdentifiers()`/`getParameters()` returning copies, newline/non-ASCII rejection in the assembled signature base, custom `Signature-Input` parameter SFV-type round-tripping, and uppercase field identifiers being rejected when parsed from untrusted input.
+[`ComplianceValidation.test.ets`](rfc9421_message_signing/src/ohosTest/ets/test/ComplianceValidation.test.ets) covers everything else this library validates or enforces beyond §2.1's worked examples: rejecting unknown/inapplicable component parameters, Boolean-flag parameter typing and `?0` handling, `@query-param` form-urlencoded decoding of `;name` and re-encoding of the returned value (including RFC 9421 §2.2.8's own worked examples, and a dedicated regression test pinning the exact percent-encode set against `encodeURIComponent()`'s different one), rejecting invalid derived/field component values, duplicate covered-component-identifier detection, `getComponentIdentifiers()`/`getParameters()` returning copies, newline/non-ASCII rejection in the assembled signature base, custom `Signature-Input` parameter SFV-type round-tripping, and uppercase field identifiers being rejected when parsed from untrusted input.
 
 Given the example message fragment from §2.1:
 
@@ -274,4 +274,4 @@ This library does not implement `;tr` (no trailer access in the `ComponentProvid
 
 ## License
 
-This project is licensed under the MIT License; see the `license` field in [oh-package.json5](rfc9421_signing/oh-package.json5).
+This project is licensed under the MIT License; see the `license` field in [oh-package.json5](rfc9421_message_signing/oh-package.json5).

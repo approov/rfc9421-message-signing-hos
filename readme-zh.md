@@ -1,4 +1,4 @@
-# @approov/rfc9421-signing
+# @approov/rfc9421-message-signing
 
 [English](README.md) | 中文
 
@@ -6,12 +6,12 @@
 
 [RFC 9421 HTTP Message Signatures](https://www.rfc-editor.org/rfc/rfc9421.html)(RFC 9421 §2)中"消息组件"与"签名基串"部分的 ArkTS 实现:组件标识符(component identifier)、HTTP 字段规范化、`Signature-Input` 参数、以及签名基串的构建。本库本身不做签名/验签(不涉及密钥管理或加解密算法)——它产出的是签名方交给签名算法的、验签方重建后用于校验签名的那个精确字节串。
 
-依赖 [@approov/rfc8941_sfv](https://github.com/approov/rfc8941-sfv-hos) 完成 Structured Field Values(RFC 8941/9651)的解析与序列化。
+依赖 [@approov/rfc9651-sfv](https://github.com/approov/rfc8941-sfv-hos) 完成 Structured Field Values(RFC 8941/9651)的解析与序列化。
 
 ## 安装
 
 ```
-ohpm install @approov/rfc9421-signing
+ohpm install @approov/rfc9421-message-signing
 ```
 
 关于如何搭建 OpenHarmony ohpm 环境,参见 [How to install an OpenHarmony ohpm package](https://gitee.com/openharmony-tpc/docs/blob/master/OpenHarmony_har_usage.md)。
@@ -23,7 +23,7 @@ ohpm install @approov/rfc9421-signing
 `ComponentProvider` 是一个抽象类:针对每种传输层(例如某个 HTTP 客户端的请求/响应类型)实现一次,向签名基串构建器暴露 derived component(`@method`、`@path` 等)和 HTTP 字段。
 
 ```typescript
-import { ComponentProvider } from '@approov/rfc9421-signing';
+import { ComponentProvider } from '@approov/rfc9421-message-signing';
 
 class MyRequestComponentProvider extends ComponentProvider {
   getMethod(): string | null { return this.request.method; }
@@ -73,7 +73,7 @@ class MyRequestComponentProvider extends ComponentProvider {
 ### 构建签名基串
 
 ```typescript
-import { SignatureParameters, SignatureBaseBuilder, ComponentProvider } from '@approov/rfc9421-signing';
+import { SignatureParameters, SignatureBaseBuilder, ComponentProvider } from '@approov/rfc9421-message-signing';
 
 const params = new SignatureParameters()
   .addComponentIdentifier(ComponentProvider.DC_METHOD)
@@ -95,8 +95,8 @@ const base = new SignatureBaseBuilder(params, provider).createSignatureBase();
 ### 从 `Signature-Input` 头重建参数
 
 ```typescript
-import { parseDictionary } from '@approov/rfc8941_sfv';
-import { SignatureParameters } from '@approov/rfc9421-signing';
+import { parseDictionary } from '@approov/rfc9651-sfv';
+import { SignatureParameters } from '@approov/rfc9421-message-signing';
 
 const dict = parseDictionary(signatureInputHeaderValue);
 const params = SignatureParameters.fromDictionaryEntry(dict, 'sig1');
@@ -117,7 +117,7 @@ getQueryParam(name: string): string | null {
 ```
 
 ```typescript
-import { StringItem, SfvParameters } from '@approov/rfc8941_sfv';
+import { StringItem, SfvParameters } from '@approov/rfc9651-sfv';
 
 const provider = new MyRequestComponentProvider(request); // q -> "café & crème"
 const id = StringItem.valueOf('@query-param').withParams(SfvParameters.EMPTY.add('name', 'q'));
@@ -132,7 +132,7 @@ provider.getComponentValue(id); // "caf%C3%A9%20%26%20cr%C3%A8me" —— 空格�
 本库抛出的所有错误都继承自 `SignatureError`,且每个子类都可以包装一个底层原因(会采用该原因的 message/name/stack):
 
 ```typescript
-import { SignatureError, ComponentValueError } from '@approov/rfc9421-signing';
+import { SignatureError, ComponentValueError } from '@approov/rfc9421-message-signing';
 
 try {
   builder.createSignatureBase();
@@ -174,9 +174,9 @@ try {
 
 ## 测试
 
-[`HttpFieldsRfc9421.test.ets`](rfc9421_signing/src/ohosTest/ets/test/HttpFieldsRfc9421.test.ets) 把 [RFC 9421 §2.1 "HTTP Fields"](https://www.rfc-editor.org/rfc/rfc9421.html#http-fields)(含其 §2.1.1–§2.1.4 子节)里的每一个 worked example 都转成了针对一个 fixture `ComponentProvider` 的可运行测试用例。下表是同一批例子,方便不查 RFC 原文也能直接参考。
+[`HttpFieldsRfc9421.test.ets`](rfc9421_message_signing/src/ohosTest/ets/test/HttpFieldsRfc9421.test.ets) 把 [RFC 9421 §2.1 "HTTP Fields"](https://www.rfc-editor.org/rfc/rfc9421.html#http-fields)(含其 §2.1.1–§2.1.4 子节)里的每一个 worked example 都转成了针对一个 fixture `ComponentProvider` 的可运行测试用例。下表是同一批例子,方便不查 RFC 原文也能直接参考。
 
-[`ComplianceValidation.test.ets`](rfc9421_signing/src/ohosTest/ets/test/ComplianceValidation.test.ets) 覆盖了 §2.1 worked example 之外本库校验/强制执行的其他所有规则:拒绝未知/不适用的 component 参数、Boolean 类型参数的类型校验和 `?0` 处理、`@query-param` 对 `;name` 的 form-urlencoded 解码以及对返回值的重新编码(含 RFC 9421 §2.2.8 自身的 worked example,以及一条专门把精确 percent-encode 字符集和 `encodeURIComponent()` 那套不同字符集钉死区分开的回归测试)、拒绝不合法的 derived/字段 component 值、重复 covered-component-identifier 检测、`getComponentIdentifiers()`/`getParameters()` 返回副本、签名基串里换行符/非 ASCII 字符的拒绝、自定义 `Signature-Input` 参数的 SFV 类型往返保真,以及从不可信输入解析时大写字段标识符被拒绝。
+[`ComplianceValidation.test.ets`](rfc9421_message_signing/src/ohosTest/ets/test/ComplianceValidation.test.ets) 覆盖了 §2.1 worked example 之外本库校验/强制执行的其他所有规则:拒绝未知/不适用的 component 参数、Boolean 类型参数的类型校验和 `?0` 处理、`@query-param` 对 `;name` 的 form-urlencoded 解码以及对返回值的重新编码(含 RFC 9421 §2.2.8 自身的 worked example,以及一条专门把精确 percent-encode 字符集和 `encodeURIComponent()` 那套不同字符集钉死区分开的回归测试)、拒绝不合法的 derived/字段 component 值、重复 covered-component-identifier 检测、`getComponentIdentifiers()`/`getParameters()` 返回副本、签名基串里换行符/非 ASCII 字符的拒绝、自定义 `Signature-Input` 参数的 SFV 类型往返保真,以及从不可信输入解析时大写字段标识符被拒绝。
 
 给定 §2.1 中的示例消息片段:
 
@@ -251,4 +251,4 @@ Example-Header: value, with, lots, of, commas
 
 ## 许可证
 
-本项目基于 MIT 许可证发布;详见 [oh-package.json5](rfc9421_signing/oh-package.json5) 中的 `license` 字段。
+本项目基于 MIT 许可证发布;详见 [oh-package.json5](rfc9421_message_signing/oh-package.json5) 中的 `license` 字段。

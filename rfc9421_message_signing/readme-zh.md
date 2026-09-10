@@ -1,4 +1,4 @@
-# @approov/rfc9421-signing
+# @approov/rfc9421-message-signing
 
 [English](README.md) | 中文
 
@@ -6,12 +6,12 @@
 
 [RFC 9421 HTTP Message Signatures](https://www.rfc-editor.org/rfc/rfc9421.html)(RFC 9421 §2)中"消息组件"与"签名基串"部分的 ArkTS 实现:组件标识符(component identifier)、HTTP 字段规范化、`Signature-Input` 参数、以及签名基串的构建。本库本身不做签名/验签(不涉及密钥管理或加解密算法)——它产出的是签名方交给签名算法的、验签方重建后用于校验签名的那个精确字节串。
 
-依赖 [@approov/rfc8941_sfv](https://github.com/approov/rfc8941-sfv-hos) 完成 Structured Field Values(RFC 8941/9651)的解析与序列化。
+依赖 [@approov/rfc9651-sfv](https://github.com/approov/rfc8941-sfv-hos) 完成 Structured Field Values(RFC 8941/9651)的解析与序列化。
 
 ## 安装
 
 ```
-ohpm install @approov/rfc9421-signing
+ohpm install @approov/rfc9421-message-signing
 ```
 
 关于如何搭建 OpenHarmony ohpm 环境,参见 [How to install an OpenHarmony ohpm package](https://gitee.com/openharmony-tpc/docs/blob/master/OpenHarmony_har_usage.md)。
@@ -23,7 +23,7 @@ ohpm install @approov/rfc9421-signing
 `ComponentProvider` 是一个抽象类:针对每种传输层(例如某个 HTTP 客户端的请求/响应类型)实现一次,向签名基串构建器暴露 derived component(`@method`、`@path` 等)和 HTTP 字段。
 
 ```typescript
-import { ComponentProvider } from '@approov/rfc9421-signing';
+import { ComponentProvider } from '@approov/rfc9421-message-signing';
 
 class MyRequestComponentProvider extends ComponentProvider {
   getMethod(): string | null { return this.request.method; }
@@ -73,7 +73,7 @@ class MyRequestComponentProvider extends ComponentProvider {
 ### 构建签名基串
 
 ```typescript
-import { SignatureParameters, SignatureBaseBuilder, ComponentProvider } from '@approov/rfc9421-signing';
+import { SignatureParameters, SignatureBaseBuilder, ComponentProvider } from '@approov/rfc9421-message-signing';
 
 const params = new SignatureParameters()
   .addComponentIdentifier(ComponentProvider.DC_METHOD)
@@ -95,8 +95,8 @@ const base = new SignatureBaseBuilder(params, provider).createSignatureBase();
 ### 从 `Signature-Input` 头重建参数
 
 ```typescript
-import { parseDictionary } from '@approov/rfc8941_sfv';
-import { SignatureParameters } from '@approov/rfc9421-signing';
+import { parseDictionary } from '@approov/rfc9651-sfv';
+import { SignatureParameters } from '@approov/rfc9421-message-signing';
 
 const dict = parseDictionary(signatureInputHeaderValue);
 const params = SignatureParameters.fromDictionaryEntry(dict, 'sig1');
@@ -117,7 +117,7 @@ getQueryParam(name: string): string | null {
 ```
 
 ```typescript
-import { StringItem, SfvParameters } from '@approov/rfc8941_sfv';
+import { StringItem, SfvParameters } from '@approov/rfc9651-sfv';
 
 const provider = new MyRequestComponentProvider(request); // q -> "café & crème"
 const id = StringItem.valueOf('@query-param').withParams(SfvParameters.EMPTY.add('name', 'q'));
@@ -132,7 +132,7 @@ provider.getComponentValue(id); // "caf%C3%A9%20%26%20cr%C3%A8me" —— 空格�
 本库抛出的所有错误都继承自 `SignatureError`,且每个子类都可以包装一个底层原因(会采用该原因的 message/name/stack):
 
 ```typescript
-import { SignatureError, ComponentValueError } from '@approov/rfc9421-signing';
+import { SignatureError, ComponentValueError } from '@approov/rfc9421-message-signing';
 
 try {
   builder.createSignatureBase();

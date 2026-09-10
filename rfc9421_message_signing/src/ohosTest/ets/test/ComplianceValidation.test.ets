@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@ohos/hypium';
-import { Dictionary, IntegerItem, StringItem, TokenItem, parseDictionary, parseItem } from '@approov/rfc8941_sfv';
-import type { ItemType } from '@approov/rfc8941_sfv';
+import { Dictionary, IntegerItem, StringItem, TokenItem, parseDictionary, parseItem } from '@approov/rfc9651-sfv';
+import type { ItemType } from '@approov/rfc9651-sfv';
 import { ComponentProvider } from '../../../main/ets/ComponentProvider';
 import { SignatureBaseBuilder } from '../../../main/ets/SignatureBaseBuilder';
 import { SignatureParameters } from '../../../main/ets/SignatureParameters';

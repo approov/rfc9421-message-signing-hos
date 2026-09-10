@@ -1,6 +1,6 @@
 {
   "module": {
-    "name": "rfc9421_signing_test",
+    "name": "rfc9421_message_signing_test",
     "type": "feature",
     "deviceTypes": [
       "default",

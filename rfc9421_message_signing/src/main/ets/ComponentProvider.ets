@@ -1,5 +1,5 @@
-import { StringItem, BooleanItem, parseDictionary, parseList, parseItem, ByteSequenceItem, HttpHeaderUtils, SfvList } from '@approov/rfc8941_sfv';
-import type { Dictionary, SfvParameters, ItemType, ListElement } from '@approov/rfc8941_sfv';
+import { StringItem, BooleanItem, parseDictionary, parseList, parseItem, ByteSequenceItem, HttpHeaderUtils, SfvList } from '@approov/rfc9651-sfv';
+import type { Dictionary, SfvParameters, ItemType, ListElement } from '@approov/rfc9651-sfv';
 import {
   UnknownComponentError,
   MalformedComponentIdentifierError,

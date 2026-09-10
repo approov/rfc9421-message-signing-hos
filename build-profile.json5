@@ -7,11 +7,11 @@
         "material": {
           "certpath": "/Users/jie/.ohos/config/default_rfc9421_signing_hos_OK6PNj1-ZA6_EqLTbVY0DkmCacNHX-zF5QeYSwtgVI4=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001A3D0B0991845152F922F05BCF81F4F4CB4E03B44A8304F892B1E123ADBA0F8E2B6E0E41193BDB",
+          "keyPassword": "0000001A3FB896B681CC6D6AA5B5C149A349E19A7571C65C07B7B897B5228C88925E4850B5822373E899",
           "profile": "/Users/jie/.ohos/config/default_rfc9421_signing_hos_OK6PNj1-ZA6_EqLTbVY0DkmCacNHX-zF5QeYSwtgVI4=.p7b",
           "signAlg": "SHA256withECDSA",
           "storeFile": "/Users/jie/.ohos/config/default_rfc9421_signing_hos_OK6PNj1-ZA6_EqLTbVY0DkmCacNHX-zF5QeYSwtgVI4=.p12",
-          "storePassword": "0000001A724B0917B717E67A31A51F005FF8D20F65B63FA61DC2925B98F185CDDE7E03B110121454891B"
+          "storePassword": "0000001AA71E9116C2ABCCF35A7ED51E9ADE359A5721BDE61FABBDBE244CBB08F702A878FE8E77AD7A73"
         }
       }
     ],
@@ -53,8 +53,8 @@
       ]
     },
     {
-      "name": "rfc9421_signing",
-      "srcPath": "./rfc9421_signing",
+      "name": "rfc9421_message_signing",
+      "srcPath": "./rfc9421_message_signing"
     }
   ]
 }

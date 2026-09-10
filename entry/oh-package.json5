@@ -6,7 +6,8 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "@approov/rfc8941_sfv": "1.0.0"
+    "@approov/rfc9651-sfv": "1.0.0",
+    "@approov/rfc9421-message-signing": "file:./libs/rfc9421_message_signing.har"
   }
 }
 

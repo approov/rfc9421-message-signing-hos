@@ -1,6 +1,6 @@
 {
   "module": {
-    "name": "rfc9421_signing",
+    "name": "rfc9421_message_signing",
     "type": "har",
     "deviceTypes": [
       "default",
